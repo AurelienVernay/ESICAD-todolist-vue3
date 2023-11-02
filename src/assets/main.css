@@ -1,0 +1,15 @@
+@font-face {
+  font-family: 'Roboto';
+  src: url('./Roboto-Regular.ttf');
+}
+html,
+body {
+  background-color: wheat;
+  font: 1rem 'Roboto';
+  margin: 0;
+  padding: 0;
+}
+
+* {
+  box-sizing: border-box;
+}
