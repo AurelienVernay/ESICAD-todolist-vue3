@@ -18,47 +18,32 @@
  * vers une valeur qui se base sur une ou plusieurs refs
  * Doc : https://vuejs.org/api/reactivity-core.html#computed
  */
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue';
 /**
  *  on importe les composants que l'on veut utiliser dans notre composant
  *  (par convention, Vue suggère que les éléments répétables soit suffixés du mot `Item`)
  *  on utilise @ pour désigner le dossier `src` (voir ./tsconfig.app.json)
  * */
-import TodoItem from '@/components/TodoItem.vue'
-import type { Todo } from '@/models/Todo.model'
+import TodoItem from '@/components/TodoItem.vue';
+import type { Todo } from '@/models/Todo.model';
 
 // on déclare une variable mesTodos qui est une ref sur un tableau de Todo
+const loaded = ref<boolean>(false);
+const mesTodos = ref<Todo[]>([]);
+onMounted(async () => {
+  const maRequete = await fetch('http://localhost:3000/todos');
 
-const mesTodos = ref<Todo[]>(
-  [
-    'Comprendre la POO',
-    'Avoir compris le Design Pattern MVC',
-    'Mettre en place le Design Pattern MVVM',
-    'Créer une application Vue.js',
-    'Créer un composant TodoItem générique',
-    "réutiliser ce composant dans l'application",
-    'faire un style plus joli',
-  ]
-    /** pour calculer des ids, j'utilise la fonction map de l'Array pour
-      transformer chaque valeur et lui calculer un id en fonction de
-      son indice dans le tableau
-      J'utilise l'object spreading pour "étaler" toutes les propriétés d'`element` 
-      et je rajoute une propriété `id` qui vaut l'index + 1 (pour partir de 1 à n)
-  */
-    .map((element, index) => ({
-      text: element,
-      done: index < 6,
-      displayDone: true,
-      id: index + 1,
-    })),
-)
+  const mesResultats = await maRequete.json();
+  mesTodos.value = mesResultats.map((r: any) => ({ ...r, displayDone: true }));
+  loaded.value = true;
+});
 
 /** 
   je définis une ref computed newTodoId qui calcule le prochain id à saisir
   de cette manière je n'ai pas à me soucier de le recalculer à chaque fois 
   que j'ajoute un élément dans mon tableau mesTodos
 */
-let newTodoId = computed(() => mesTodos.value.length + 1)
+let newTodoId = computed(() => mesTodos.value.length + 1);
 /**
   je définis une ref newTodo qui représente le Todo que l'on a ajouter
 */
@@ -67,7 +52,7 @@ const newTodo = ref<Todo>({
   displayDone: false,
   text: '',
   id: newTodoId.value,
-})
+});
 
 /**
  * Cette fonction permet de gérer la mise à jour d'un todo
@@ -91,8 +76,8 @@ const handleUpdateTodo = (totoNewValue: Todo, index: number) => {
     ...mesTodos.value.slice(0, index),
     totoNewValue,
     ...mesTodos.value.slice(index + 1),
-  ]
-}
+  ];
+};
 /**
  * fonction appelée pour ajouter le nouveau todo à la collection des todos
  */
@@ -105,17 +90,17 @@ const addTodo = () => {
          (sinon on ne verrait pas la case à cocher et l'id ne serait pas à jour)
       */
       { ...newTodo.value, displayDone: true, id: newTodoId.value },
-    )
+    );
     // alternativement, on aurait pu écrire : mesTodos.value = [...mesTodos.value, {[nouvel objet]}]
 
     // on reset le texte du newTodo
-    newTodo.value.text = ''
+    newTodo.value.text = '';
   }
-}
+};
 /**
  * on set une ref computed qui se met à jour dès que mesTodos est complètement done
  */
-const allDone = computed(() => mesTodos.value.filter((t) => !t.done).length === 0)
+const allDone = computed(() => mesTodos.value.filter((t) => !t.done).length === 0);
 </script>
 
 <template>
@@ -128,16 +113,13 @@ const allDone = computed(() => mesTodos.value.filter((t) => !t.done).length === 
       <h2 class="title">Mes Todos</h2>
       <template v-for="(monTodo, index) in mesTodos" :key="monTodo.id">
         <!-- 
-          on injecte la valeur de `monTodo` dans la prop `todo` 
-          que l'on a défini dans `TodoItem` à l'aide de `:todo`
-        -->
-        <TodoItem
-          :todo="monTodo"
-          @update:todo="($event: Todo) => handleUpdateTodo($event, index)"
-        />
+                  on injecte la valeur de `monTodo` dans la prop `todo` 
+                  que l'on a défini dans `TodoItem` à l'aide de `:todo`
+                -->
+        <TodoItem :todo="monTodo" @update:todo="($event: Todo) => handleUpdateTodo($event, index)" />
         <!-- 
-          on utilise `v-if` pour conditionner l'injection d'un élément selon une expression 
-        -->
+                  on utilise `v-if` pour conditionner l'injection d'un élément selon une expression 
+                -->
         <hr v-if="index !== mesTodos.length - 1" />
       </template>
     </div>
@@ -145,22 +127,18 @@ const allDone = computed(() => mesTodos.value.filter((t) => !t.done).length === 
       <h2 class="title">Ajouter un Todo</h2>
       <div class="new-todo">
         <!-- 
-          Ici on gère 2 évènements émis par TodoItem : 
-           - `update:todo` pour récupérer la saisie du label du todo
-           - `enter` pour ajouter le todo dans le tableau mesTodos à l'aide d'`addTodo`
-        -->
-        <TodoItem
-          :todo="newTodo"
-          @update:todo="($event: Todo) => (newTodo = $event)"
-          @enter="addTodo"
-        />
+                  Ici on gère 2 évènements émis par TodoItem : 
+                   - `update:todo` pour récupérer la saisie du label du todo
+                   - `enter` pour ajouter le todo dans le tableau mesTodos à l'aide d'`addTodo`
+                -->
+        <TodoItem :todo="newTodo" @update:todo="($event: Todo) => (newTodo = $event)" @enter="addTodo" />
         <!-- on désactive le bouton si on a rien tapé dans le todo pour éviter des saisies vides -->
         <button @click="addTodo" :disabled="newTodo.text.length === 0">Ajouter</button>
       </div>
     </div>
   </main>
   <!-- Si tous les todos sont done, on ajoute des confettis parce que c'est la fête -->
-  <img v-if="allDone" src="./assets/confetti.svg" class="all-done" />
+  <img v-if="loaded && allDone" src="./assets/confetti.svg" class="all-done" />
 </template>
 
 <!--
@@ -183,12 +161,14 @@ const allDone = computed(() => mesTodos.value.filter((t) => !t.done).length === 
 header {
   line-height: 1.5;
 }
+
 main {
   display: flex;
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
 }
+
 .card {
   width: calc(100% - 1rem);
   border-radius: 12px;
@@ -196,20 +176,24 @@ main {
   padding: 0.5rem;
   margin-bottom: 1rem;
 }
+
 @media screen and ((min-width: 768px)) {
   main {
     flex-direction: row;
     align-items: start;
   }
+
   .card {
     width: calc(50% - 1rem);
   }
 }
+
 .new-todo {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
+
 .new-todo button {
   margin-top: 0.5rem;
 }
@@ -231,6 +215,7 @@ main {
 .title {
   text-align: center;
 }
+
 hr {
   color: goldenrod;
 }

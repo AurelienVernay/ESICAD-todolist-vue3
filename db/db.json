@@ -1,0 +1,24 @@
+{
+  "todos": [
+    {
+      "todoId": 1,
+      "text": "fetch loaded data from vue frontend app ",
+      "done": true
+    },
+    {
+      "todoId": 2,
+      "text": "display those todos inside my app",
+      "done": true
+    },
+    {
+      "todoId": 3,
+      "text": "develop methods to update my json db of todos",
+      "done": false
+    },
+    {
+      "todoId": 4,
+      "text": "watch mutation of mesTodos to automatically update todos",
+      "done": false
+    }
+  ]
+}
