@@ -27,6 +27,7 @@ const handleTextChange = ($event: Event) => {
        (on sait que la cible de l'évènement sera toujours l'input texte) 
        puis on récupère sa valeur
     */
+
   const newValue = ($event.target as HTMLInputElement).value
   /*  on émet un évenement `update:todo` qui va pouvoir être capté par le composant parent
         on donne en paramètre la nouvelle valeur du todo à stocker
@@ -63,38 +64,25 @@ const handleCheckboxChange = ($event: Event) => {
 <template>
   <div class="todo">
     <!-- on bind la valeur de l'input à la propriété todo.text à l'aide de :value
-        (binding descendant => la valeur sera réinjectée dès que la prop todo.text change)
-        https://vuejs.org/guide/essentials/template-syntax.html 
-        https://vuejs.org/guide/essentials/forms.html  
-        on bind l'évènement de saisie input à la fonction `handleTextChange` (@input)
-        (binding ascendant => on réagit à l'évènement en 
-        https://vuejs.org/guide/essentials/event-handling.html#method-handlers
-        on bind également l'évènement keyup.enter (lorqu'on a fini d'appuyer sur entrée) 
-        pour émettre un évènement (utile pour ajouter un todo en appuyant sur entrée)
-    -->
-    <input
-      class="text-box"
-      :disabled="todo.done"
-      :class="{
-        done: todo.done,
-      }"
-      type="text"
-      :value="todo.text"
-      @input="handleTextChange"
-      @keyup.enter="emits('enter')"
-    />
+            (binding descendant => la valeur sera réinjectée dès que la prop todo.text change)
+            https://vuejs.org/guide/essentials/template-syntax.html 
+            https://vuejs.org/guide/essentials/forms.html  
+            on bind l'évènement de saisie input à la fonction `handleTextChange` (@input)
+            (binding ascendant => on réagit à l'évènement en 
+            https://vuejs.org/guide/essentials/event-handling.html#method-handlers
+            on bind également l'évènement keyup.enter (lorqu'on a fini d'appuyer sur entrée) 
+            pour émettre un évènement (utile pour ajouter un todo en appuyant sur entrée)
+        -->
+    <input class="text-box" :disabled="todo.done" :class="{
+      done: todo.done,
+    }" type="text" :value="todo.text" @input="handleTextChange" @keyup.enter="emits('enter')" />
     <!--    on conditionne l'affichage de la case à cocher si la propriété displayDone est à vrai 
-            https://vuejs.org/guide/essentials/conditional.html
-            Pour une checkbox, l'évènement qui envoie la valeur est change, on s'attache donc dessus
-            pour réagir au changement
-    -->
-    <input
-      v-if="todo.displayDone"
-      type="checkbox"
-      :checked="todo.done"
-      :title="`Click to set ${todo.done ? 'not done' : 'done'}`"
-      @change="handleCheckboxChange"
-    />
+                https://vuejs.org/guide/essentials/conditional.html
+                Pour une checkbox, l'évènement qui envoie la valeur est change, on s'attache donc dessus
+                pour réagir au changement
+        -->
+    <input v-if="todo.displayDone" type="checkbox" :checked="todo.done"
+      :title="`Click to set ${todo.done ? 'not done' : 'done'}`" @change="handleCheckboxChange" />
   </div>
 </template>
 
