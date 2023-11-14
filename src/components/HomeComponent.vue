@@ -18,7 +18,7 @@
  * vers une valeur qui se base sur une ou plusieurs refs
  * Doc : https://vuejs.org/api/reactivity-core.html#computed
  */
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 /**
  *  on importe les composants que l'on veut utiliser dans notre composant
  *  (par convention, Vue suggère que les éléments répétables soit suffixés du mot `Item`)
@@ -32,7 +32,7 @@ import type { Todo } from '@/models/Todo.model';
 const mesTodos = ref<Todo[]>([]);
 
 onMounted(async () => {
-    const response = await fetch('http://localhost:3000/todos');
+    const response = await fetch('api/todos');
     const monTableau = await response.json();
     mesTodos.value = monTableau.map((unTodo: Todo & { todoId: number }) => ({
         ...unTodo,
@@ -41,6 +41,9 @@ onMounted(async () => {
     }));
 });
 
+watch(mesTodos, (newMesTodos, oldMesTodos) => {
+    console.log(JSON.stringify(newMesTodos), JSON.stringify(oldMesTodos));
+})
 /** 
   je définis une ref computed newTodoId qui calcule le prochain id à saisir
   de cette manière je n'ai pas à me soucier de le recalculer à chaque fois 
@@ -80,6 +83,8 @@ const handleUpdateTodo = (totoNewValue: Todo, index: number) => {
         totoNewValue,
         ...mesTodos.value.slice(index + 1),
     ];
+
+
 };
 /**
  * fonction appelée pour ajouter le nouveau todo à la collection des todos

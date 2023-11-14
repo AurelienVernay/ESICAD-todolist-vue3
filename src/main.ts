@@ -25,12 +25,13 @@ const routes: RouteRecordRaw[] = [
   { path: '/home', redirect: '/' },
   // une autre route /about render le AboutComponent
   { path: '/about', component: AboutComponent },
+  { path: '/not-found', component: PageNotFoundComponent },
   /*
    *   si aucune route n'a matché le path, on peut créer une route "wildcard"
    *   qui redirige vers un composant not found
    *   (vous pouvez tester en mettant n'importe quel chemin dans l'URL après le domaine)
    */
-  { path: '/:pathMatch(.*)*', name: 'not-found', component: PageNotFoundComponent },
+  { path: '/:pathMatch(.*)*', name: 'not-found', redirect: '/not-found' },
 ];
 
 /*
